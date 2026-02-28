@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Booking
 {
@@ -17,7 +18,8 @@ namespace Booking
 
                 Console.WriteLine("=================================");
                 Console.WriteLine("        BOOK YOUR FLIGHT!");
-                Console.WriteLine("================================="); Console.WriteLine("1. View Available Flights");
+                Console.WriteLine("================================="); 
+                Console.WriteLine("1. View Available Flights");
                 Console.WriteLine("2. Search Flight");
                 Console.WriteLine("3. Book Flight");
                 Console.WriteLine("4. View Bookings");
@@ -29,6 +31,8 @@ namespace Booking
                 Console.Write("Select an option: ");
 
                 string choice = Console.ReadLine();
+
+               
                 switch (choice)
                 {
                     case "1":
@@ -67,10 +71,15 @@ namespace Booking
         static void ViewFlights()
         {
             Console.Clear();
+            List<string> flights = new List<String>();
+            flights.Add("1. Tokyo to South Korea");
+            flights.Add("2. USA to Canada");
+            flights.Add("3. Philippines to Japan");
             Console.WriteLine("=== AVAILABLE FLIGHTS ===");
-            Console.WriteLine("1. Tokyo to South Korea");
-            Console.WriteLine("2. USA to Canada");
-            Console.WriteLine("3. Philippines to Japan");
+            foreach (string flight in flights)
+            {
+                Console.WriteLine(flight);
+            }
 
             Pause();
         }
