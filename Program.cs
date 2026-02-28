@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ﻿using System;
+=======
+using System;
+>>>>>>> f3819ab1bb1dff0074c35573ae532ff30f85e253
 using System.Collections.Generic;
 
 namespace Booking
