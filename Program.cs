@@ -1,13 +1,12 @@
-
-
 using System;
-
-using System.Collections.Generic;
-
+using BookingAppServices;
+using BookingModels;
 namespace Booking
 {
     internal class Program
     {
+        static BApp app = new BApp();
+
         static void Main(string[] args)
         {
             MainMenu();
@@ -21,21 +20,18 @@ namespace Booking
 
                 Console.WriteLine("=================================");
                 Console.WriteLine("        BOOK YOUR FLIGHT!");
-                Console.WriteLine("================================="); 
+                Console.WriteLine("=================================");
                 Console.WriteLine("1. View Available Flights");
                 Console.WriteLine("2. Search Flight");
                 Console.WriteLine("3. Book Flight");
                 Console.WriteLine("4. View Bookings");
                 Console.WriteLine("5. Cancel Booking");
                 Console.WriteLine("6. Exit");
-
                 Console.WriteLine("=================================");
-                Console.WriteLine();
                 Console.Write("Select an option: ");
 
                 string choice = Console.ReadLine();
 
-               
                 switch (choice)
                 {
                     case "1":
@@ -59,37 +55,34 @@ namespace Booking
                         break;
 
                     case "6":
-                        Console.WriteLine("Exiting System...");
                         return;
 
                     default:
-                        Console.WriteLine("Invalid Choice!!!");
+                        Console.WriteLine("Invalid Choice!");
                         Pause();
                         break;
                 }
-
             }
         }
 
         static void ViewFlights()
         {
             Console.Clear();
-            List<string> flights = new List<String>();
-            flights.Add("1. Tokyo to South Korea");
-            flights.Add("2. USA to Canada");
-            flights.Add("3. Philippines to Japan");
+            var flights = app.GetFlights();
+
             Console.WriteLine("=== AVAILABLE FLIGHTS ===");
-            foreach (string flight in flights)
+
+            for (int i = 0; i < flights.Count; i++)
             {
-                Console.WriteLine(flight);
+                Console.WriteLine($"{i + 1}. {flights[i]}");
             }
 
             Pause();
         }
+
         static void SearchFlight()
         {
             Console.Clear();
-            Console.WriteLine("=== SEARCH FLIGHT ===");
 
             Console.Write("Enter Departure City: ");
             string from = Console.ReadLine();
@@ -97,9 +90,17 @@ namespace Booking
             Console.Write("Enter Destination City: ");
             string to = Console.ReadLine();
 
-            Console.WriteLine();
-            Console.WriteLine("Searching flights from " + from + " to " + to + "...");
-            Console.WriteLine("(Search results will appear here)");
+            var results = app.SearchFlight(from, to);
+
+            Console.WriteLine("\nSearch Results:");
+
+            foreach (var flight in results)
+            {
+                Console.WriteLine(flight);
+            }
+
+            if (results.Count == 0)
+                Console.WriteLine("No matching flights found.");
 
             Pause();
         }
@@ -107,18 +108,17 @@ namespace Booking
         static void BookFlight()
         {
             Console.Clear();
-            Console.WriteLine("=== BOOK FLIGHT ===");
+            ViewFlights();
 
             Console.Write("Enter Flight ID: ");
-            string flightID = Console.ReadLine();
+            int id = Convert.ToInt32(Console.ReadLine()) - 1;
 
             Console.Write("Enter Passenger Name: ");
             string name = Console.ReadLine();
 
-            Console.WriteLine();
+            app.BookFlight(id, name);
+
             Console.WriteLine("Booking Confirmed!");
-            Console.WriteLine("Passenger: " + name);
-            Console.WriteLine("Flight ID: " + flightID);
 
             Pause();
         }
@@ -126,8 +126,17 @@ namespace Booking
         static void ViewBookings()
         {
             Console.Clear();
-            Console.WriteLine("=== VIEW BOOKINGS ===");
-            Console.WriteLine("(Bookings will appear here)");
+            var bookings = app.GetBookings();
+
+            Console.WriteLine("=== BOOKINGS ===");
+
+            for (int i = 0; i < bookings.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {bookings[i].PassengerName} - {bookings[i].FlightRoute}");
+            }
+
+            if (bookings.Count == 0)
+                Console.WriteLine("No bookings found.");
 
             Pause();
         }
@@ -135,20 +144,21 @@ namespace Booking
         static void CancelBooking()
         {
             Console.Clear();
-            Console.WriteLine("=== CANCEL BOOKING ===");
+            ViewBookings();
 
             Console.Write("Enter Booking ID: ");
-            string bookingID = Console.ReadLine();
+            int id = Convert.ToInt32(Console.ReadLine()) - 1;
 
-            Console.WriteLine("Booking Cancelled (Demo Only)");
+            app.CancelBooking(id);
+
+            Console.WriteLine("Booking Cancelled!");
 
             Pause();
         }
 
         static void Pause()
         {
-            Console.WriteLine();
-            Console.WriteLine("Press any key to return to menu...");
+            Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
     }
