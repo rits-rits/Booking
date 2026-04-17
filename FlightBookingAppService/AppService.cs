@@ -6,7 +6,7 @@ namespace FlightBookingAppService
 {
     public class AppService
     {
-        IFlightBookingDataService dataService = new FlightJsonDataService();
+        DataService dataService = new DataService(new FlightDBDataService());
         int bookingCounter = 1;
 
         public List<Flight> GetFlights()

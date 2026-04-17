@@ -80,7 +80,13 @@ namespace FlightBookingDataService
                 new Flight { FlightID = 2, Route = "Manila to Ottawa" },
                 new Flight { FlightID = 3, Route = "Manila to Bern" },
                 new Flight { FlightID = 4, Route = "Manila to Tokyo" },
-                new Flight { FlightID = 5, Route = "Manila to Bangkok" }
+                new Flight { FlightID = 5, Route = "Manila to Bangkok" },
+                new Flight { FlightID = 6, Route = "Manila to Beijing" },
+                new Flight { FlightID = 7, Route = "Manila to Taipei" },
+                new Flight { FlightID = 8, Route = "Manila to Rome" },
+                new Flight { FlightID = 9, Route = "Manila to Washington" },
+                new Flight { FlightID = 10, Route = "Manila to London" }
+
             });
 
             SaveFlights();
