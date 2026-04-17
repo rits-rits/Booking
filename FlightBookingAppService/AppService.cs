@@ -6,7 +6,7 @@ namespace FlightBookingAppService
 {
     public class AppService
     {
-        DataService dataService = new DataService();
+        IFlightBookingDataService dataService = new FlightJsonDataService();
         int bookingCounter = 1;
 
         public List<Flight> GetFlights()
@@ -73,6 +73,8 @@ namespace FlightBookingAppService
                 return false;
 
             booking.Status = "CONFIRMED";
+
+            dataService.UpdateBooking(booking);
             return true;
         }
         public void AutoCancelExpired()
