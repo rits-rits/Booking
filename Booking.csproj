@@ -8,8 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BookingAppServices\BookingAppServices.csproj" />
-    <ProjectReference Include="..\BookingModels\BookingModels.csproj" />
+    <ProjectReference Include="..\FlightBookingAppService\FlightBookingAppService.csproj" />
   </ItemGroup>
 
 </Project>

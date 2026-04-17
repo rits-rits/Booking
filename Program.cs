@@ -1,66 +1,41 @@
+using FlightBookingAppService;
+using FlightBookingModels;
 using System;
-using BookingAppServices;
-using BookingModels;
+
 namespace Booking
 {
     internal class Program
     {
-        static BApp app = new BApp();
+        static AppService appService = new AppService();
 
         static void Main(string[] args)
-        {
-            MainMenu();
-        }
-
-        static void MainMenu()
         {
             while (true)
             {
                 Console.Clear();
-
                 Console.WriteLine("=================================");
                 Console.WriteLine("        BOOK YOUR FLIGHT!");
                 Console.WriteLine("=================================");
-                Console.WriteLine("1. View Available Flights");
+                Console.WriteLine("1. View Flights");
                 Console.WriteLine("2. Search Flight");
                 Console.WriteLine("3. Book Flight");
                 Console.WriteLine("4. View Bookings");
-                Console.WriteLine("5. Cancel Booking");
-                Console.WriteLine("6. Exit");
-                Console.WriteLine("=================================");
-                Console.Write("Select an option: ");
+                Console.WriteLine("5. Pay Booking");
+                Console.WriteLine("6. Cancel Booking");
+                Console.WriteLine("7. Exit");
+                Console.Write("Select option: ");
 
                 string choice = Console.ReadLine();
 
                 switch (choice)
                 {
-                    case "1":
-                        ViewFlights();
-                        break;
-
-                    case "2":
-                        SearchFlight();
-                        break;
-
-                    case "3":
-                        BookFlight();
-                        break;
-
-                    case "4":
-                        ViewBookings();
-                        break;
-
-                    case "5":
-                        CancelBooking();
-                        break;
-
-                    case "6":
-                        return;
-
-                    default:
-                        Console.WriteLine("Invalid Choice!");
-                        Pause();
-                        break;
+                    case "1": ViewFlights(); break;
+                    case "2": SearchFlight(); break;
+                    case "3": BookFlight(); break;
+                    case "4": ViewBookings(); break;
+                    case "5": PayBooking(); break;
+                    case "6": CancelBooking(); break;
+                    case "7": return;
                 }
             }
         }
@@ -68,13 +43,13 @@ namespace Booking
         static void ViewFlights()
         {
             Console.Clear();
-            var flights = app.GetFlights();
+            var flights = appService.GetFlights();
 
-            Console.WriteLine("=== AVAILABLE FLIGHTS ===");
+            Console.WriteLine("=== FLIGHTS ===");
 
-            for (int i = 0; i < flights.Count; i++)
+            foreach (var f in flights)
             {
-                Console.WriteLine($"{i + 1}. {flights[i]}");
+                Console.WriteLine($"{f.FlightID}. {f.Route}");
             }
 
             Pause();
@@ -83,24 +58,27 @@ namespace Booking
         static void SearchFlight()
         {
             Console.Clear();
-
-            Console.Write("Enter Departure City: ");
+            ViewFlights();
+            Console.Write("From: ");
             string from = Console.ReadLine();
 
-            Console.Write("Enter Destination City: ");
+            Console.Write("To: ");
             string to = Console.ReadLine();
 
-            var results = app.SearchFlight(from, to);
+            var results = appService.SearchFlights(from, to);
 
-            Console.WriteLine("\nSearch Results:");
-
-            foreach (var flight in results)
-            {
-                Console.WriteLine(flight);
-            }
-
+            Console.WriteLine("\nResults:");
             if (results.Count == 0)
-                Console.WriteLine("No matching flights found.");
+            {
+                Console.WriteLine("No flights found.");
+            }
+            else
+            {
+                foreach (var f in results)
+                {
+                    Console.WriteLine($"{f.FlightID}. {f.Route}");
+                }
+            }
 
             Pause();
         }
@@ -111,54 +89,101 @@ namespace Booking
             ViewFlights();
 
             Console.Write("Enter Flight ID: ");
-            int id = Convert.ToInt32(Console.ReadLine()) - 1;
+            int flightId;
+            while (!int.TryParse(Console.ReadLine(), out flightId))
+            {
+                Console.Write("Invalid input: ");
+            }
 
-            Console.Write("Enter Passenger Name: ");
+            Console.Write("Passenger Name: ");
             string name = Console.ReadLine();
 
-            app.BookFlight(id, name);
+            Console.Write("Seat Number: ");
+            int seat;
+            while (!int.TryParse(Console.ReadLine(), out seat))
+            {
+                Console.Write("Invalid seat: ");
+            }
 
-            Console.WriteLine("Booking Confirmed!");
+            Console.WriteLine("Payment Method:");
+            Console.WriteLine("1. Cash");
+            Console.WriteLine("2. Card");
+            Console.Write("Choose: ");
+
+            string payment = Console.ReadLine() == "1" ? "Cash" : "Card";
+
+            bool success = appService.BookFlight(flightId, name, seat, payment);
+
+            Console.WriteLine(success
+                ? "Booking is PENDING. Complete payment within 10 minutes."
+                : "Booking failed (invalid flight or seat taken)");
 
             Pause();
         }
-
         static void ViewBookings()
         {
             Console.Clear();
-            var bookings = app.GetBookings();
+            var bookings = appService.GetBookings();
 
             Console.WriteLine("=== BOOKINGS ===");
 
-            for (int i = 0; i < bookings.Count; i++)
-            {
-                Console.WriteLine($"{i + 1}. {bookings[i].PassengerName} - {bookings[i].FlightRoute}");
-            }
-
             if (bookings.Count == 0)
-                Console.WriteLine("No bookings found.");
+            {
+                Console.WriteLine("No bookings.");
+            }
+            else
+            {
+                foreach (var b in bookings)
+                {
+                    Console.WriteLine(
+                        $"{b.BookingID}. {b.PassengerName} | Flight {b.FlightID} | Seat {b.SeatNumber} | {b.PaymentMethod} | {b.Status}"
+                    );
+                }
+            }
 
             Pause();
         }
+        static void PayBooking()
+        {
+            Console.Clear();
+            ViewBookings();
 
+            Console.Write("Enter Booking ID to pay: ");
+            int id;
+            while (!int.TryParse(Console.ReadLine(), out id))
+            {
+                Console.Write("Invalid input: ");
+            }
+
+            bool success = appService.ConfirmPayment(id);
+
+            Console.WriteLine(success
+                ? "Payment successful! Booking CONFIRMED."
+                : "Payment failed (booking not found or already processed)");
+
+            Pause();
+        }
         static void CancelBooking()
         {
             Console.Clear();
             ViewBookings();
 
             Console.Write("Enter Booking ID: ");
-            int id = Convert.ToInt32(Console.ReadLine()) - 1;
+            int id;
+            while (!int.TryParse(Console.ReadLine(), out id))
+            {
+                Console.Write("Invalid input: ");
+            }
 
-            app.CancelBooking(id);
+            bool success = appService.CancelBooking(id);
 
-            Console.WriteLine("Booking Cancelled!");
-
+            Console.WriteLine(success ? "Cancelled!" : "Booking not found.");
             Pause();
         }
 
         static void Pause()
         {
-            Console.WriteLine("\nPress any key to continue...");
+            Console.WriteLine("\nPress any key...");
             Console.ReadKey();
         }
     }
