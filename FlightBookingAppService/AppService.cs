@@ -60,11 +60,16 @@ namespace FlightBookingAppService
             AutoCancelExpired();
             return dataService.GetBookings();
         }
+        public void UpdateBooking(Booking booking)
+        {
+            dataService.UpdateBooking(booking);
+        }
 
         public bool CancelBooking(int bookingId)
         {
             return dataService.DeleteBooking(bookingId);
         }
+
         public bool ConfirmPayment(int bookingId)
         {
             var booking = dataService.GetBookingById(bookingId);
